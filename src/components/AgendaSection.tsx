@@ -1,4 +1,5 @@
 import { MapPin, Clock, Ticket } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 
 const shows = [
@@ -40,14 +41,11 @@ const AgendaSection = () => {
   return (
     <section 
       id="agenda" 
-      className="relative py-32 overflow-hidden bg-gradient-hero"
+      className="relative py-16 overflow-hidden bg-gradient-hero"
       aria-labelledby="agenda-heading"
     >
       <div className="relative z-10 container mx-auto px-6">
         <header className="text-center mb-16">
-          <span className="inline-block px-4 py-2 rounded-full glass-card text-sm font-medium text-primary mb-6 tracking-wider uppercase">
-            Ao Vivo
-          </span>
           <h2 id="agenda-heading" className="font-display text-5xl md:text-7xl mb-6">
             Próximos <span className="text-gradient">Shows</span>
           </h2>
@@ -69,7 +67,7 @@ const AgendaSection = () => {
               {/* Date */}
               <time 
                 className="flex-shrink-0 w-20 h-20 rounded-xl bg-gradient-primary flex flex-col items-center justify-center"
-                dateTime={`2025-${show.month === 'MAR' ? '03' : '04'}-${show.date}T${show.time.replace('h', ':00')}`}
+                // dateTime={`2025-${show.month === 'MAR' ? '03' : '04'}-${show.date}T${show.time.replace('h', ':00')}`}
                 itemProp="startDate"
               >
                 <span className="font-display text-3xl text-primary-foreground leading-none">

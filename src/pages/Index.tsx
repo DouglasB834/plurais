@@ -1,15 +1,17 @@
-import { useEffect, useRef } from "react";
-import Navbar from "@/components/Navbar";
-import HeroSection from "@/components/HeroSection";
-import AboutSection from "@/components/AboutSection";
-import AlbumSection from "@/components/AlbumSection";
-import AgendaSection from "@/components/AgendaSection";
-import PlaylistSection from "@/components/PlaylistSection";
-import Footer from "@/components/Footer";
-import SocialLinks from "@/components/SocialLinks";
-import { useMusicStore } from "@/store/useMusicStore";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect, useRef } from "react";
+
+import { useMusicStore } from "@/store/useMusicStore";
+import AboutSection from "@/components/AboutSection";
+import AgendaSection from "@/components/AgendaSection";
+import AlbumSection from "@/components/AlbumSection";
+import Footer from "@/components/Footer";
+import HeroSection from "@/components/HeroSection";
+import Navbar from "@/components/Navbar";
+import PlaylistSection from "@/components/PlaylistSection";
+import SocialLinks from "@/components/SocialLinks";
+
 // Register GSAP plugins
 // gsap.registerPlugin(ScrollTrigger, Flip);
 
@@ -58,8 +60,8 @@ const Index = () => {
       <HeroSection />
       {/* <AboutSection /> */}
       {/* <AlbumSection /> */}
-      {/* <AgendaSection /> */}
       <PlaylistSection />
+      <AgendaSection />
       {/* <Footer /> */}
     </main>
   );

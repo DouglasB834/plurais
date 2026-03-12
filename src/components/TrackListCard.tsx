@@ -27,7 +27,7 @@ export const TrackListCard = ({ track, index }: { track: Track; index: number })
     >
       {/* Parte principal/maior do \"L\" (Vídeo ou Imagem grande) */}
       <div 
-        className={`track-video-area  bg-white/10 p-2 md:p-4   flex flex-col justify-center w-full md:w-2/3 aspect-video relative overflow-hidden transition-all duration-700 ${isEven ? 'md:rounded-tr-xl' : 'md:rounded-bl-xl'} `}
+        className={`track-video-area  bg-white/10 p-2 md:p-4   flex flex-col justify-center w-full md:w-2/3 aspect-video relative overflow-hidden transition-all duration-700 ${isEven ? 'md:rounded-tr-xl md:rounded-l-xl' : 'md:rounded-bl-xl md:rounded-r-xl'} `}
       >
         {track.youtubeUrl ? (
           <iframe 
