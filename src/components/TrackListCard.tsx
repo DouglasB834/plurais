@@ -49,8 +49,8 @@ export const TrackListCard = ({ track, index }: { track: Track; index: number })
       <div 
         className={`track-info-area glass-card p-6 md:p-8 rounded-[2rem] flex flex-col w-full md:w-1/3 justify-center md:justify-between transition-all duration-700 hover:border-white/30 ${
           isEven ? 'md:self-end' : 'md:self-start'
-        } ${index === 0 ? 'opacity-0' : ''}`} 
-        style={{ minHeight: '200px' }}
+        }`} 
+        style={{ minHeight: '200px', opacity: index === 0 ? 0 : 1 }} 
       >
         <div>
           <h3 className="text-2xl md:text-3xl font-display text-white mb-2 leading-tight">{track.title}</h3>

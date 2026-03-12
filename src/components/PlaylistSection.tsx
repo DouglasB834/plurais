@@ -39,12 +39,24 @@ const PlaylistSection = () => {
         // Ensure origin is set for smooth scaling
         gsap.set(heroPlayer, { transformOrigin: "center center" });
 
+        // Kill any existing ScrollTrigger for this animation to prevent conflicts on refresh
+        ScrollTrigger.getAll().forEach(st => {
+          if (st.vars.trigger === firstTrack) st.kill();
+        });
+
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top bottom", 
-            end: "top 15%",     
-            scrub: 0.5,
+            start: "top 98%",
+            endTrigger: firstTrack,
+            end: "top 60%",
+            scrub: 0.2,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              if (self.direction === -1) {
+                self.animation.progress(0);
+              }
+            }
           }
         });
 
@@ -52,43 +64,34 @@ const PlaylistSection = () => {
           x: () => {
              const heroRect = heroPlayer.getBoundingClientRect();
              const targetRect = infoArea?.getBoundingClientRect() || firstTrack.getBoundingClientRect();
-             const currentTransformX = parseFloat(gsap.getProperty(heroPlayer, "x") as string || "0");
-             
-             // Calculate center to center
-             const heroCenterX = heroRect.left + heroRect.width / 2;
-             const targetCenterX = targetRect.left + targetRect.width / 2;
-             return currentTransformX + (targetCenterX - heroCenterX);
+             const currentX = parseFloat(gsap.getProperty(heroPlayer, "x") as string || "0");
+             return currentX + (targetRect.left + targetRect.width/2) - (heroRect.left + heroRect.width/2);
           },
           y: () => {
              const heroRect = heroPlayer.getBoundingClientRect();
              const targetRect = infoArea?.getBoundingClientRect() || firstTrack.getBoundingClientRect();
-             const currentTransformY = parseFloat(gsap.getProperty(heroPlayer, "y") as string || "0");
-             
-             // Calculate center to center
-             const heroCenterY = heroRect.top + heroRect.height / 2;
-             const targetCenterY = targetRect.top + targetRect.height / 2;
-             return currentTransformY + (targetCenterY - heroCenterY);
+             const currentY = parseFloat(gsap.getProperty(heroPlayer, "y") as string || "0");
+             return currentY + (targetRect.top + targetRect.height/2) - (heroRect.top + heroRect.height/2);
           },
           scale: () => {
              const heroRect = heroPlayer.getBoundingClientRect();
              const targetRect = infoArea?.getBoundingClientRect() || firstTrack.getBoundingClientRect();
-             // Scale based on the smaller card width (infoArea)
-             return (targetRect.width * 0.95) / heroRect.width;
+             const currentScale = Number(gsap.getProperty(heroPlayer, "scaleX")) || 1;
+             return (targetRect.width * 0.98) / (heroRect.width / currentScale);
           },
-          borderRadius: "2rem",
-          ease: "power2.inOut"
+          borderRadius: "1.5rem",
+          ease: "none"
         })
         .to(heroPlayer, {
           opacity: 0,
-          duration: 0.1,
-          ease: "none"
-        }, ">-0.1")
+          duration: 0.05
+        }, "-=0.05")
         .to(infoArea, {
           opacity: 1,
-          duration: 0.2,
-          ease: "back.out(1.2)"
-        }, "<");
-      }
+          duration: 0.05,
+          ease: "none"
+        }, "-=0.05"); // Sync with player fade out
+    }
 
       // Animate track cards (Stacking / Stagger effect)
       if (listRef.current) {
@@ -125,9 +128,6 @@ const PlaylistSection = () => {
         
         {/* Section Header */}
         <div ref={titleRef} className="text-center mb-16">
-          <span className="inline-block px-4 py-2 rounded-full glass-card border border-white/10 text-xs font-bold text-white mb-6 tracking-widest uppercase">
-            A Experiência
-          </span>
           <h2 className="font-display text-5xl md:text-7xl mb-6 text-white leading-tight">
             Descubra as <span className="text-gradient-primary">Faixas</span>
           </h2>

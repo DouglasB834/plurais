@@ -1,6 +1,7 @@
-import React, { useRef, useEffect } from 'react';
-import { useMusicStore } from '@/store/useMusicStore';
 import { Play, Pause, SkipForward, SkipBack, Repeat, Shuffle } from 'lucide-react';
+import React, { useRef, useEffect } from 'react';
+
+import { useMusicStore } from '@/store/useMusicStore';
 import { Slider } from '@/components/ui/slider';
 
 // Define the component so it can be animated or transitioned globally
@@ -19,7 +20,7 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
         {...props}
       >
         {/* Decorative inner glow */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+        <div className="absolute top-0 right-0  bg-primary/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
 
         {/* Album Cover */}
         <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-2xl">
@@ -34,8 +35,8 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
 
         {/* Track Info */}
         <div className="flex flex-col items-center text-center px-2">
-          <h3 className="text-xl font-bold text-white truncate w-full shadow-sm">{currentTrack.title}</h3>
-          <p className="text-sm text-white/70 truncate w-full font-light">{currentTrack.artist}</p>
+          <h3 className="text-xl font-light text-white truncate w-full shadow-sm">{currentTrack.title}</h3>
+          <p className="text-sm text-white/90 truncate w-full font-light">{currentTrack.artist}</p>
         </div>
 
         {/* Player Controls & Progress */}

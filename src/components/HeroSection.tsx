@@ -1,17 +1,21 @@
-import { Button } from "@/components/ui/button";
 import { Instagram, Youtube, Facebook, Twitter } from "lucide-react";
-// import heroBg from "/PLURAIS_1.JPG";
+import { Link } from "react-router-dom";
+
+import { Button } from "@/components/ui/button";
+
 import { MusicPlayerCard } from "./MusicPlayerCard";
+// import heroBg from "/PLURAIS_1.JPG";
+
 const HeroSection = () => {
   return (
     <section 
       id="hero" 
-      className="relative min-h-screen flex items-center justify-center z-20"
+      className="relative min-h-screen flex items-start justify-center z-20 mt-20"
       aria-label="Seção principal - Novo álbum Plurais 2025"
     >
       {/* Background Image */}
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat overflow-hidden" 
+        className="absolute inset-0 bg-cover bg-center lg:max-w-[1600px] bg-no-repeat overflow-hidden" 
         style={{ backgroundImage: `url(/PLURAIS_1.JPG)` }}
         role="img"
         aria-label="Palco com luzes vibrantes - Atmosfera de show da banda Plurais"
@@ -23,40 +27,42 @@ const HeroSection = () => {
       <div className="absolute inset-0 noise-overlay pointer-events-none" aria-hidden="true" />
 
       {/* Glow Effect */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-3xl animate-pulse-glow" aria-hidden="true" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-3xl animate-pulse-glow" aria-hidden="true"/>
 
       {/* Content */}
-      <header className="relative z-10 container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[80vh]">
+      <div className="relative z-10 container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center min-h-[80vh]">
         {/* Left Column - Text & Socials */}
-        <div className="flex flex-col items-start text-left space-y-8 animate-slide-up">
-          <span className="inline-block px-4 py-2 rounded-full glass-card text-xs font-bold text-primary tracking-wider uppercase border border-primary/30">
-            Para Todos
-          </span>
+        <div className="flex flex-col items-start text-left space-y-10 animate-slide-up">
+          <nav className="flex flex-wrap gap-4 pt-4 max-auto justify-center" aria-label="Redes Sociais">
+            <Link to="https://www.instagram.com/pluraisoficial/">
+              <img
+                src="/instagram-cut.png"
+                alt="Instagram"
+                className="w-12 h-12 object-contain hover:scale-110 transition-transform duration-300"
+              />
+            </Link>
 
-          <h1 className="font-display text-5xl md:text-7xl lg:text-8xl leading-tight">
-            O seu <span className="text-white">Universo</span><br />
-            de <span className="text-white font-black">Músicas</span>
-          </h1>
+            <Link to="https://www.youtube.com/@plurais">
+              <img
+                src="Youtube.png"
+                alt="YouTube"
+                className="w-12 h-12 object-contain hover:scale-110 transition-transform duration-300"
+              />
+            </Link>
 
-          <p className="text-xl md:text-2xl text-white/70 max-w-xl font-light leading-relaxed">
-            Encontre os seus artistas, playlists, podcasts e músicas preferidos em um só lugar.
-          </p>
+            <Link
+              to={" https://www.facebook.com/pluraisoficial/"}
+            >
+              <img src="/facebook.svg" alt="Facebook"  className="w-12 h-12 hover:scale-110 transition-all duration-300" />
+            </Link>
 
-          <nav className="flex flex-wrap gap-4 pt-4" aria-label="Redes Sociais">
-            <Button variant="outline" size="lg" className="glass-card hover:bg-white/10 hover:text-white border-white/20">
-              <Instagram size={20} className="mr-2" />
-              Instagram
-            </Button>
-            <Button variant="outline" size="lg" className="glass-card hover:bg-white/10 hover:text-white border-white/20">
-              <Youtube size={20} className="mr-2" />
-              YouTube
-            </Button>
-            <Button variant="outline" size="icon" className="glass-card hover:bg-white/10 w-12 h-12 border-white/20">
-              <Facebook size={20} />
-            </Button>
-            <Button variant="outline" size="icon" className="glass-card hover:bg-white/10 w-12 h-12 border-white/20">
-              <Twitter size={20} />
-            </Button>
+            <Link to="https://www.youtube.com/@plurais">
+              <img
+                src="/Twitter-cut.png"
+                alt="Twitter"
+                className="w-12 h-12 object-contain hover:scale-110 transition-transform duration-300"
+              />
+            </Link>
           </nav>
         </div>
 
@@ -67,7 +73,7 @@ const HeroSection = () => {
              <MusicPlayerCard />
           </div>
         </div>
-      </header>
+      </div>
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-float z-20">
         <a 
           href="#about" 
