@@ -34,34 +34,28 @@ const HeroSection = () => {
         {/* Left Column - Text & Socials */}
         <div className="flex flex-col items-start text-left space-y-10 animate-slide-up">
           <nav className="flex flex-wrap gap-4 pt-4 max-auto justify-center" aria-label="Redes Sociais">
-            <Link to="https://www.instagram.com/pluraisoficial/">
-              <img
-                src="/instagram-cut.png"
-                alt="Instagram"
-                className="w-12 h-12 object-contain hover:scale-110 transition-transform duration-300"
-              />
+          <Link
+              to={" https://www.instagram.com/pluraisoficial/"}
+            >
+              <img src="/instagram-cut.png" alt="Instagram"  className="w-14 h-14 hover:scale-110 transition-all duration-300" />
             </Link>
 
-            <Link to="https://www.youtube.com/@plurais">
-              <img
-                src="Youtube.png"
-                alt="YouTube"
-                className="w-12 h-12 object-contain hover:scale-110 transition-transform duration-300"
-              />
+            <Link
+              to={"https://www.youtube.com/@plurais"}
+            >
+              <img src="Youtube.png" alt="YouTube Music"  className="w-14 h-14 hover:scale-110 transition-all duration-300" />
             </Link>
 
             <Link
               to={" https://www.facebook.com/pluraisoficial/"}
             >
-              <img src="/facebook.svg" alt="Facebook"  className="w-12 h-12 hover:scale-110 transition-all duration-300" />
+              <img src="/facebook.svg" alt="Facebook"  className="w-14 h-14 hover:scale-110 transition-all duration-300" />
             </Link>
 
-            <Link to="https://www.youtube.com/@plurais">
-              <img
-                src="/Twitter-cut.png"
-                alt="Twitter"
-                className="w-12 h-12 object-contain hover:scale-110 transition-transform duration-300"
-              />
+            <Link
+              to={"https://www.youtube.com/@plurais"}
+            >
+              <img src="/Twitter-cut.png" alt="Twitter" sizes="100vw" className="w-14 h-14 hover:scale-110 transition-all duration-300" />
             </Link>
           </nav>
         </div>

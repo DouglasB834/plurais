@@ -1,6 +1,8 @@
-import React, { useRef } from 'react';
 import { Play, Pause } from 'lucide-react';
+import React, { useRef } from 'react';
+
 import { Track, useMusicStore } from '@/store/useMusicStore';
+
 import { Button } from './ui/button';
 
 export const TrackListCard = ({ track, index }: { track: Track; index: number }) => {
@@ -21,12 +23,11 @@ export const TrackListCard = ({ track, index }: { track: Track; index: number })
   return (
     <div 
       ref={cardRef} 
-      id={index === 0 ? "first-track-card" : undefined}
-      className={`relative flex flex-col md:flex-row gap-4 w-full max-w-5xl mx-auto my-11 group ${!isEven ? 'md:flex-row-reverse' : ''}`}
+      className={`relative flex flex-col md:flex-row w-full max-w-5xl mx-auto my-11 group ${!isEven ? 'md:flex-row-reverse' : ''}`}
     >
-      {/* Parte principal/maior do "L" (Vídeo ou Imagem grande) */}
+      {/* Parte principal/maior do \"L\" (Vídeo ou Imagem grande) */}
       <div 
-        className={`track-video-area glass-card p-2 md:p-4 rounded-[2rem] flex flex-col justify-center w-full md:w-2/3 aspect-video relative overflow-hidden transition-all duration-700 hover:border-white/30`}
+        className={`track-video-area  bg-white/10 p-2 md:p-4   flex flex-col justify-center w-full md:w-2/3 aspect-video relative overflow-hidden transition-all duration-700 ${isEven ? 'md:rounded-tr-xl' : 'md:rounded-bl-xl'} `}
       >
         {track.youtubeUrl ? (
           <iframe 
@@ -45,12 +46,12 @@ export const TrackListCard = ({ track, index }: { track: Track; index: number })
         )}
       </div>
 
-      {/* Parte menor do "L" (Informações da faixa) */}
+      {/* Parte menor do \"L\" (Informações da faixa) */}
       <div 
-        className={`track-info-area glass-card p-6 md:p-8 rounded-[2rem] flex flex-col w-full md:w-1/3 justify-center md:justify-between transition-all duration-700 hover:border-white/30 ${
-          isEven ? 'md:self-end' : 'md:self-start'
+        className={`track-info-area bg-white/10 p-6 md:p-8  flex flex-col w-full md:w-1/3 justify-center md:justify-between transition-all duration-700 ${
+          isEven ? 'md:self-end md:rounded-r-[2rem]' : 'md:self-start md:rounded-l-[2rem]'
         }`} 
-        style={{ minHeight: '200px', opacity: index === 0 ? 0 : 1 }} 
+        style={{ minHeight: '200px' }} 
       >
         <div>
           <h3 className="text-2xl md:text-3xl font-display text-white mb-2 leading-tight">{track.title}</h3>
