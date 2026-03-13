@@ -7,8 +7,87 @@ import { Slider } from '@/components/ui/slider';
 // Define the component so it can be animated or transitioned globally
 export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
-    const { currentTrack, isPlaying, togglePlay, nextTrack, prevTrack, progress, setProgress, volume, setVolume } = useMusicStore();
-    
+    const {
+      currentTrack,
+      isPlaying,
+      togglePlay,
+      nextTrack,
+      prevTrack,
+      progress,
+      currentTime,
+      duration,
+      setCurrentTime,
+      setDuration,
+      volume,
+      setVolume,
+    } = useMusicStore();
+
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    const formatTime = (timeInSeconds: number) => {
+      if (!timeInSeconds || Number.isNaN(timeInSeconds)) return '0:00';
+      const minutes = Math.floor(timeInSeconds / 60);
+      const seconds = Math.floor(timeInSeconds % 60)
+        .toString()
+        .padStart(2, '0');
+      return `${minutes}:${seconds}`;
+    };
+
+    // Sync volume with audio element
+    useEffect(() => {
+      if (!audioRef.current) return;
+      audioRef.current.volume = volume / 100;
+    }, [volume]);
+
+    // Sync current track & play/pause with audio element
+    useEffect(() => {
+      const audio = audioRef.current;
+      if (!audio || !currentTrack) return;
+
+      if (currentTrack.audioUrl && audio.src !== currentTrack.audioUrl) {
+        audio.src = currentTrack.audioUrl;
+        audio.load();
+      }
+
+      if (isPlaying) {
+        audio
+          .play()
+          .catch(() => {
+            // Best-effort; silently ignore autoplay errors
+          });
+      } else {
+        audio.pause();
+      }
+    }, [currentTrack, isPlaying]);
+
+    // Attach audio event listeners
+    useEffect(() => {
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      const handleLoadedMetadata = () => {
+        setDuration(audio.duration || 0);
+      };
+
+      const handleTimeUpdate = () => {
+        setCurrentTime(audio.currentTime || 0);
+      };
+
+      const handleEnded = () => {
+        nextTrack();
+      };
+
+      audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.addEventListener('timeupdate', handleTimeUpdate);
+      audio.addEventListener('ended', handleEnded);
+
+      return () => {
+        audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        audio.removeEventListener('timeupdate', handleTimeUpdate);
+        audio.removeEventListener('ended', handleEnded);
+      };
+    }, [nextTrack, setCurrentTime, setDuration]);
+
     // Fallback if no track is loaded
     if (!currentTrack) return null;
 
@@ -19,6 +98,7 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
         className={`glass-card rounded-[2rem] p-6 w-full max-w-[320px] flex flex-col gap-6 relative overflow-hidden group hover-lift transition-all duration-300 ${className || ''}`}
         {...props}
       >
+        <audio ref={audioRef} className="hidden" />
         {/* Decorative inner glow */}
         <div className="absolute top-0 right-0  bg-primary/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
 
@@ -48,12 +128,20 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
               value={[progress]}
               max={100}
               step={0.1}
-              onValueChange={(val) => setProgress(val[0])}
+              onValueChange={(val) => {
+                const percent = val[0];
+                const safeDuration = duration || 0;
+                const newTime = safeDuration > 0 ? (percent / 100) * safeDuration : 0;
+                if (audioRef.current) {
+                  audioRef.current.currentTime = newTime;
+                }
+                setCurrentTime(newTime);
+              }}
               className="w-full [&_[role=slider]]:bg-primary [&>span:first-child]:bg-white/20"
             />
             <div className="flex justify-between text-xs text-white/50 font-mono">
-              <span>0:00</span>
-              <span>{currentTrack.duration || '3:45'}</span>
+              <span>{formatTime(currentTime)}</span>
+              <span>{duration ? formatTime(duration) : currentTrack.duration || '3:45'}</span>
             </div>
           </div>
 

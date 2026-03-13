@@ -14,10 +14,14 @@ interface MusicStoreState {
   currentTrack: Track | null;
   isPlaying: boolean;
   progress: number;
+  currentTime: number;
+  duration: number;
   volume: number;
   playTrack: (track: Track) => void;
   togglePlay: () => void;
   setProgress: (progress: number) => void;
+  setCurrentTime: (time: number) => void;
+  setDuration: (duration: number) => void;
   setVolume: (volume: number) => void;
   nextTrack: () => void;
   prevTrack: () => void;
@@ -58,13 +62,44 @@ export const useMusicStore = create<MusicStoreState>((set, get) => ({
   currentTrack: mockTracks[0],
   isPlaying: false,
   progress: 0,
+  currentTime: 0,
+  duration: 0,
   volume: 50,
   
-  playTrack: (track) => set({ currentTrack: track, isPlaying: true, progress: 0 }),
+  playTrack: (track) =>
+    set({
+      currentTrack: track,
+      isPlaying: true,
+      progress: 0,
+      currentTime: 0,
+      duration: 0,
+    }),
   
   togglePlay: () => set((state) => ({ isPlaying: !state.isPlaying })),
   
+  // Mantido para compatibilidade, mas o progresso agora é calculado a partir de currentTime/duration
   setProgress: (progress) => set({ progress }),
+
+  setCurrentTime: (time) =>
+    set((state) => {
+      const safeDuration = state.duration || 0;
+      const progress = safeDuration > 0 ? (time / safeDuration) * 100 : 0;
+      return {
+        currentTime: time,
+        progress,
+      };
+    }),
+
+  setDuration: (duration) =>
+    set((state) => {
+      const safeDuration = duration || 0;
+      const progress =
+        safeDuration > 0 ? (state.currentTime / safeDuration) * 100 : 0;
+      return {
+        duration: safeDuration,
+        progress,
+      };
+    }),
 
   setVolume: (volume) => set({ volume }),
   
@@ -74,7 +109,13 @@ export const useMusicStore = create<MusicStoreState>((set, get) => ({
     if (!currentTrack) return;
     const currentIndex = mockTracks.findIndex(t => t.id === currentTrack.id);
     const nextIndex = (currentIndex + 1) % mockTracks.length;
-    set({ currentTrack: mockTracks[nextIndex], isPlaying: true, progress: 0 });
+    set({
+      currentTrack: mockTracks[nextIndex],
+      isPlaying: true,
+      progress: 0,
+      currentTime: 0,
+      duration: 0,
+    });
   },
   
   prevTrack: () => {
@@ -82,6 +123,12 @@ export const useMusicStore = create<MusicStoreState>((set, get) => ({
     if (!currentTrack) return;
     const currentIndex = mockTracks.findIndex(t => t.id === currentTrack.id);
     const prevIndex = (currentIndex - 1 + mockTracks.length) % mockTracks.length;
-    set({ currentTrack: mockTracks[prevIndex], isPlaying: true, progress: 0 });
+    set({
+      currentTrack: mockTracks[prevIndex],
+      isPlaying: true,
+      progress: 0,
+      currentTime: 0,
+      duration: 0,
+    });
   }
 }));
