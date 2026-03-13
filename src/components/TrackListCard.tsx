@@ -6,7 +6,14 @@ import { Track, useMusicStore } from '@/store/useMusicStore';
 import { Button } from './ui/button';
 
 export const TrackListCard = ({ track, index }: { track: Track; index: number }) => {
-  const { currentTrack, playTrack, isPlaying, togglePlay, progress } = useMusicStore();
+  const {
+    currentTrack,
+    playTrack,
+    isPlaying,
+    togglePlay,
+    currentTime,
+    duration,
+  } = useMusicStore();
   const cardRef = useRef<HTMLDivElement>(null);
   
   const isThisTrackPlaying = currentTrack?.id === track.id;
@@ -84,7 +91,12 @@ export const TrackListCard = ({ track, index }: { track: Track; index: number })
               className={`h-full rounded-full transition-all duration-200 ${
                 isThisTrackPlaying ? 'bg-primary' : 'bg-transparent'
               }`}
-              style={{ width: isThisTrackPlaying ? `${progress}%` : '0%' }}
+              style={{
+                width:
+                  isThisTrackPlaying && duration > 0
+                    ? `${(currentTime / duration) * 100}%`
+                    : '0%',
+              }}
             />
           </div>
         </div>

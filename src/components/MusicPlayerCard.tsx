@@ -14,7 +14,6 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
       togglePlay,
       nextTrack,
       prevTrack,
-      progress,
       currentTime,
       duration,
       setCurrentTime,
@@ -37,7 +36,8 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
 
     const handleProgressClick = (event: React.MouseEvent<HTMLDivElement>) => {
       const container = progressBarRef.current;
-      if (!container) return;
+      const audio = audioRef.current;
+      if (!container || !audio) return;
 
       const rect = container.getBoundingClientRect();
       const clickX = event.clientX - rect.left;
@@ -48,17 +48,29 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
       if (percent < 0) percent = 0;
       if (percent > 100) percent = 100;
 
-      // Usa a duração real do elemento de áudio para manter a barra estável
-      const safeDuration =
-        (audioRef.current && audioRef.current.duration) || duration || 0;
+      // Usa preferencialmente a duração real do elemento de áudio
+      const elementDuration =
+        !Number.isNaN(audio.duration) && audio.duration > 0
+          ? audio.duration
+          : 0;
+      const safeDuration = elementDuration || duration || 0;
       if (safeDuration <= 0) return;
 
       const newTime = (percent / 100) * safeDuration;
 
-      if (audioRef.current) {
-        audioRef.current.currentTime = newTime;
+      // Atualiza o tempo real de reprodução
+      audio.currentTime = newTime;
+
+      // Garante que o áudio continue tocando a partir do novo ponto
+      if (isPlaying) {
+        audio
+          .play()
+          .catch(() => {
+            // ignore autoplay errors
+          });
       }
 
+      // Mantém o estado global em sincronia com o elemento
       setCurrentTime(newTime);
     };
 
@@ -127,6 +139,8 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
         className={`glass-card rounded-[2rem] p-6 w-full max-w-[320px] flex flex-col gap-6 relative overflow-hidden group hover-lift transition-all duration-300 ${className || ''}`}
         {...props}
       >
+        {/* Elemento de áudio único que controla toda a reprodução */}
+        <audio ref={audioRef} className="hidden" />
         {/* Decorative inner glow */}
         <div className="absolute top-0 right-0  bg-primary/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
         {/* Album Cover */}
@@ -163,14 +177,7 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
                 className="h-1 w-full overflow-hidden rounded-full bg-white/20"
               />
             </div>
-            <div className="mt-1 ">
-              <audio
-                ref={audioRef}
-                controls
-                src={currentTrack.audioUrl}
-                className="w-full"
-              />
-            </div>
+
             
             <div className="flex justify-between text-xs text-white/50 font-mono">
               <span>{formatTime(currentTime)}</span>

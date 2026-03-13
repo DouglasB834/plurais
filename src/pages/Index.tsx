@@ -2,7 +2,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef } from "react";
 
-import { useMusicStore } from "@/store/useMusicStore";
 import AboutSection from "@/components/AboutSection";
 import AgendaSection from "@/components/AgendaSection";
 import AlbumSection from "@/components/AlbumSection";
@@ -17,44 +16,9 @@ import SocialLinks from "@/components/SocialLinks";
 
 const Index = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const { currentTrack, isPlaying, volume, setProgress, nextTrack } = useMusicStore();
-
-  // Handle Play/Pause
-  useEffect(() => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.play().catch(e => console.log("Audio play error:", e));
-      } else {
-        audioRef.current.pause();
-      }
-    }
-  }, [isPlaying, currentTrack]);
-
-  // Handle Volume
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume / 100;
-    }
-  }, [volume]);
-
-  // Handle Time Update
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      const progress = (audioRef.current.currentTime / audioRef.current.duration) * 100;
-      setProgress(progress || 0);
-    }
-  };
 
   return (
     <main ref={containerRef} className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* Global Audio Element */}
-      <audio 
-        ref={audioRef}
-        src={currentTrack?.audioUrl}
-        onTimeUpdate={handleTimeUpdate}
-        onEnded={nextTrack}
-      />
       <Navbar />
       <SocialLinks />
       <HeroSection />
