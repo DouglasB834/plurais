@@ -1,12 +1,36 @@
-import { Instagram, Youtube, Facebook, Twitter } from "lucide-react";
 import { Link } from "react-router-dom";
-
-import { Button } from "@/components/ui/button";
 
 import { MusicPlayerCard } from "./MusicPlayerCard";
 // import heroBg from "/PLURAIS_1.JPG";
 
 const HeroSection = () => {
+  const socialLinks = [
+    {
+      name: "Instagram",
+      href: "https://www.instagram.com/pluraisoficial/",
+      src: "/instagram-cut.png",
+      alt: "Instagram",
+    },
+    {
+      name: "YouTube",
+      href: "https://www.youtube.com/@plurais",
+      src: "/Youtube.png",
+      alt: "YouTube",
+    },
+    {
+      name: "Facebook",
+      href: "https://www.facebook.com/pluraisoficial/",
+      src: "/Facebook-cut.png",
+      alt: "Facebook",
+    },
+    {
+      name: "Twitter",
+      href: "https://x.com/pluraisoficial",
+      src: "/Twitter-cut.png",
+      alt: "Twitter",
+    },
+  ];
+
   return (
     <section 
       id="hero" 
@@ -34,29 +58,15 @@ const HeroSection = () => {
         {/* Left Column - Text & Socials */}
         <div className="flex flex-col items-start text-left space-y-10 animate-slide-up">
           <nav className="flex flex-wrap gap-4 pt-4 max-auto justify-center" aria-label="Redes Sociais">
-          <Link
-              to={" https://www.instagram.com/pluraisoficial/"}
-            >
-              <img src="/instagram-cut.png" alt="Instagram"  className="w-14 h-14 hover:scale-110 transition-all duration-300" />
-            </Link>
-
-            <Link
-              to={"https://www.youtube.com/@plurais"}
-            >
-              <img src="Youtube.png" alt="YouTube Music"  className="w-14 h-14 hover:scale-110 transition-all duration-300" />
-            </Link>
-
-            <Link
-              to={" https://www.facebook.com/pluraisoficial/"}
-            >
-              <img src="/facebook.svg" alt="Facebook"  className="w-14 h-14 hover:scale-110 transition-all duration-300" />
-            </Link>
-
-            <Link
-              to={"https://www.youtube.com/@plurais"}
-            >
-              <img src="/Twitter-cut.png" alt="Twitter" sizes="100vw" className="w-14 h-14 hover:scale-110 transition-all duration-300" />
-            </Link>
+            {socialLinks.map((social) => (
+              <Link key={social.name} to={social.href}>
+                <img
+                  src={social.src}
+                  alt={social.alt}
+                  className="w-14 h-14 hover:scale-110 transition-all duration-300"
+                />
+              </Link>
+            ))}
           </nav>
         </div>
 

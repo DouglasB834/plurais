@@ -55,7 +55,16 @@ export const mockTracks: Track[] = [
     youtubeUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1', // Placeholder
     audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
     duration: '3:45',
-  }
+  },
+  {
+    id: '4',
+    title: 'Mashups (Ao Vivo na Toca do Bandido)',
+    artist: 'Plurais',
+    coverUrl: '/PLURAIS_1.JPG',
+    youtubeUrl: 'https://www.youtube.com/embed/xxxxxxxxxxx?enablejsapi=1', // Placeholder YouTube ID
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+    duration: '4:05',
+  },
 ];
 
 export const useMusicStore = create<MusicStoreState>((set, get) => ({

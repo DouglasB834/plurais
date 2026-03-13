@@ -3,6 +3,7 @@ import React, { useRef, useEffect } from 'react';
 
 import { useMusicStore } from '@/store/useMusicStore';
 import { Slider } from '@/components/ui/slider';
+import { Progress } from '@/components/ui/progress';
 
 // Define the component so it can be animated or transitioned globally
 export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
@@ -23,6 +24,7 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
     } = useMusicStore();
 
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    const progressBarRef = useRef<HTMLDivElement | null>(null);
 
     const formatTime = (timeInSeconds: number) => {
       if (!timeInSeconds || Number.isNaN(timeInSeconds)) return '0:00';
@@ -31,6 +33,33 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
         .toString()
         .padStart(2, '0');
       return `${minutes}:${seconds}`;
+    };
+
+    const handleProgressClick = (event: React.MouseEvent<HTMLDivElement>) => {
+      const container = progressBarRef.current;
+      if (!container) return;
+
+      const rect = container.getBoundingClientRect();
+      const clickX = event.clientX - rect.left;
+      const width = rect.width || 0;
+      if (width <= 0) return;
+
+      let percent = (clickX / width) * 100;
+      if (percent < 0) percent = 0;
+      if (percent > 100) percent = 100;
+
+      // Usa a duração real do elemento de áudio para manter a barra estável
+      const safeDuration =
+        (audioRef.current && audioRef.current.duration) || duration || 0;
+      if (safeDuration <= 0) return;
+
+      const newTime = (percent / 100) * safeDuration;
+
+      if (audioRef.current) {
+        audioRef.current.currentTime = newTime;
+      }
+
+      setCurrentTime(newTime);
     };
 
     // Sync volume with audio element
@@ -98,10 +127,8 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
         className={`glass-card rounded-[2rem] p-6 w-full max-w-[320px] flex flex-col gap-6 relative overflow-hidden group hover-lift transition-all duration-300 ${className || ''}`}
         {...props}
       >
-        <audio ref={audioRef} className="hidden" />
         {/* Decorative inner glow */}
         <div className="absolute top-0 right-0  bg-primary/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
-
         {/* Album Cover */}
         <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-2xl">
           <img 
@@ -115,8 +142,10 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
 
         {/* Track Info */}
         <div className="flex flex-col items-center text-center px-2">
-          <h3 className="text-xl font-light text-white truncate w-full shadow-sm">{currentTrack.title}</h3>
-          <p className="text-sm text-white/90 truncate w-full font-light">{currentTrack.artist}</p>
+          <h3 className="text-lg font-light text-white/90 truncate w-full">{currentTrack.title}</h3>
+          <p className="text-xs text-white/70 truncate w-full font-light tracking-wide uppercase">
+            {currentTrack.artist}
+          </p>
         </div>
 
         {/* Player Controls & Progress */}
@@ -124,21 +153,25 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
           
           {/* Progress Bar */}
           <div className="flex flex-col gap-2">
-            <Slider 
-              value={[progress]}
-              max={100}
-              step={0.1}
-              onValueChange={(val) => {
-                const percent = val[0];
-                const safeDuration = duration || 0;
-                const newTime = safeDuration > 0 ? (percent / 100) * safeDuration : 0;
-                if (audioRef.current) {
-                  audioRef.current.currentTime = newTime;
-                }
-                setCurrentTime(newTime);
-              }}
-              className="w-full [&_[role=slider]]:bg-primary [&>span:first-child]:bg-white/20"
-            />
+            <div
+              ref={progressBarRef}
+              onClick={handleProgressClick}
+              className="w-full cursor-pointer"
+            >
+              <Progress
+                value={duration > 0 ? (currentTime / duration) * 100 : 0}
+                className="h-1 w-full overflow-hidden rounded-full bg-white/20"
+              />
+            </div>
+            <div className="mt-1 ">
+              <audio
+                ref={audioRef}
+                controls
+                src={currentTrack.audioUrl}
+                className="w-full"
+              />
+            </div>
+            
             <div className="flex justify-between text-xs text-white/50 font-mono">
               <span>{formatTime(currentTime)}</span>
               <span>{duration ? formatTime(duration) : currentTrack.duration || '3:45'}</span>
