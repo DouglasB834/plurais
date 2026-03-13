@@ -17,12 +17,16 @@ interface MusicStoreState {
   currentTime: number;
   duration: number;
   volume: number;
+  /** Elemento de áudio global controlado pelo player principal */
+  audioElement: HTMLAudioElement | null;
   playTrack: (track: Track) => void;
   togglePlay: () => void;
   setProgress: (progress: number) => void;
   setCurrentTime: (time: number) => void;
   setDuration: (duration: number) => void;
   setVolume: (volume: number) => void;
+  setAudioElement: (audio: HTMLAudioElement | null) => void;
+  seekTo: (timeSeconds: number) => void;
   nextTrack: () => void;
   prevTrack: () => void;
 }
@@ -74,6 +78,7 @@ export const useMusicStore = create<MusicStoreState>((set, get) => ({
   currentTime: 0,
   duration: 0,
   volume: 50,
+  audioElement: null,
   
   playTrack: (track) =>
     set({
@@ -111,6 +116,34 @@ export const useMusicStore = create<MusicStoreState>((set, get) => ({
     }),
 
   setVolume: (volume) => set({ volume }),
+  
+  setAudioElement: (audio) => set({ audioElement: audio }),
+
+  seekTo: (timeSeconds) => {
+    const { audioElement, duration } = get();
+    if (!audioElement) return;
+
+    const elementDuration =
+      !Number.isNaN(audioElement.duration) && audioElement.duration > 0
+        ? audioElement.duration
+        : 0;
+    const baseDuration = elementDuration || duration || 0;
+    if (baseDuration <= 0) return;
+
+    const clampedTime = Math.max(0, Math.min(timeSeconds, baseDuration));
+    audioElement.currentTime = clampedTime;
+
+    set((state) => {
+      const safeDuration = state.duration || baseDuration;
+      const progress =
+        safeDuration > 0 ? (clampedTime / safeDuration) * 100 : 0;
+      return {
+        currentTime: clampedTime,
+        duration: safeDuration,
+        progress,
+      };
+    });
+  },
   
   // Dummy logic for next/prev. Will be expanded if we have a real queue
   nextTrack: () => {

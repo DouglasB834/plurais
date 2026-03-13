@@ -13,6 +13,7 @@ export const TrackListCard = ({ track, index }: { track: Track; index: number })
     togglePlay,
     currentTime,
     duration,
+    seekTo,
   } = useMusicStore();
   const cardRef = useRef<HTMLDivElement>(null);
   
@@ -25,6 +26,23 @@ export const TrackListCard = ({ track, index }: { track: Track; index: number })
     } else {
       playTrack(track);
     }
+  };
+
+  const handleProgressClickOnList = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!isThisTrackPlaying || duration <= 0) return;
+
+    const container = event.currentTarget;
+    const rect = container.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const width = rect.width || 0;
+    if (width <= 0) return;
+
+    let percent = clickX / width;
+    if (percent < 0) percent = 0;
+    if (percent > 1) percent = 1;
+
+    const newTime = percent * duration;
+    seekTo(newTime);
   };
 
   return (
@@ -86,7 +104,10 @@ export const TrackListCard = ({ track, index }: { track: Track; index: number })
           </div>
 
           {/* Barra de progresso sincronizada com o player principal */}
-          <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+          <div
+            className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden cursor-pointer"
+            onClick={handleProgressClickOnList}
+          >
             <div
               className={`h-full rounded-full transition-all duration-200 ${
                 isThisTrackPlaying ? 'bg-primary' : 'bg-transparent'

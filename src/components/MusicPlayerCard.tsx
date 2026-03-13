@@ -20,6 +20,8 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
       setDuration,
       volume,
       setVolume,
+      setAudioElement,
+      seekTo,
     } = useMusicStore();
 
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -44,35 +46,29 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
       const width = rect.width || 0;
       if (width <= 0) return;
 
-      let percent = (clickX / width) * 100;
+      let percent = clickX / width;
       if (percent < 0) percent = 0;
-      if (percent > 100) percent = 100;
+      if (percent > 1) percent = 1;
 
-      // Usa preferencialmente a duração real do elemento de áudio
       const elementDuration =
         !Number.isNaN(audio.duration) && audio.duration > 0
           ? audio.duration
           : 0;
-      const safeDuration = elementDuration || duration || 0;
-      if (safeDuration <= 0) return;
+      const baseDuration = elementDuration || duration || 0;
+      if (baseDuration <= 0) return;
 
-      const newTime = (percent / 100) * safeDuration;
-
-      // Atualiza o tempo real de reprodução
-      audio.currentTime = newTime;
-
-      // Garante que o áudio continue tocando a partir do novo ponto
-      if (isPlaying) {
-        audio
-          .play()
-          .catch(() => {
-            // ignore autoplay errors
-          });
-      }
-
-      // Mantém o estado global em sincronia com o elemento
-      setCurrentTime(newTime);
+      const newTime = percent * baseDuration;
+      seekTo(newTime);
     };
+
+    // Registra o elemento de áudio globalmente no store
+    useEffect(() => {
+      if (!audioRef.current) return;
+      setAudioElement(audioRef.current);
+      return () => {
+        setAudioElement(null);
+      };
+    }, [setAudioElement]);
 
     // Sync volume with audio element
     useEffect(() => {
