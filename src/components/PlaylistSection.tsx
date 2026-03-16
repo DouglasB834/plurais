@@ -1,8 +1,20 @@
-import { mockTracks } from "@/store/useMusicStore";
-
+import { mockTracks, useMusicStore } from "@/store/useMusicStore";
+import { useTracks } from "@/lib/tracks/useTracks";
 import { TrackListCard } from "./TrackListCard";
+import { useEffect } from "react";
 
 const PlaylistSection = () => {
+  const { data: driveTracks, isLoading } = useTracks();
+  const { setQueue } = useMusicStore();
+
+  useEffect(() => {
+    if (driveTracks && driveTracks.length > 0) {
+      setQueue(driveTracks);
+    }
+  }, [driveTracks, setQueue]);
+
+  const tracks = driveTracks && driveTracks.length > 0 ? driveTracks : mockTracks;
+  console.log(tracks, "lista de musica e fotos ")
   return (
     <section id="playlist" className="relative py-32 overflow-hidden bg-background z-10">
       {/* Background Glow */}
@@ -23,7 +35,10 @@ const PlaylistSection = () => {
 
         {/* Tracks List */}
         <div className="flex flex-col w-full">
-          {mockTracks.map((track, index) => (
+          {isLoading && !driveTracks && (
+            <p className="text-white/60 text-sm mb-4">Carregando faixas do Drive…</p>
+          )}
+          {tracks.map((track, index) => (
             <TrackListCard key={track.id} track={track} index={index} />
           ))}
         </div>

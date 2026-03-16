@@ -1,17 +1,9 @@
 import { create } from 'zustand';
-
-export interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  coverUrl: string;
-  audioUrl?: string;
-  youtubeUrl?: string;
-  duration?: string;
-}
+import { Track } from '@/lib/tracks/types';
 
 interface MusicStoreState {
   currentTrack: Track | null;
+  tracks: Track[];
   isPlaying: boolean;
   progress: number;
   currentTime: number;
@@ -29,9 +21,10 @@ interface MusicStoreState {
   seekTo: (timeSeconds: number) => void;
   nextTrack: () => void;
   prevTrack: () => void;
+  setQueue: (tracks: Track[]) => void;
 }
 
-// Temporary mock tracks for initial testing
+//TODO remove mocked Temporary mock tracks for initial testing
 export const mockTracks: Track[] = [
   {
     id: '1',
@@ -60,19 +53,11 @@ export const mockTracks: Track[] = [
     audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
     duration: '3:45',
   },
-  {
-    id: '4',
-    title: 'Mashups (Ao Vivo na Toca do Bandido)',
-    artist: 'Plurais',
-    coverUrl: '/PLURAIS_1.JPG',
-    youtubeUrl: 'https://www.youtube.com/embed/xxxxxxxxxxx?enablejsapi=1', // Placeholder YouTube ID
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-    duration: '4:05',
-  },
 ];
 
 export const useMusicStore = create<MusicStoreState>((set, get) => ({
   currentTrack: mockTracks[0],
+  tracks: mockTracks,
   isPlaying: false,
   progress: 0,
   currentTime: 0,
@@ -119,6 +104,19 @@ export const useMusicStore = create<MusicStoreState>((set, get) => ({
   
   setAudioElement: (audio) => set({ audioElement: audio }),
 
+  setQueue: (tracks) =>
+    set((state) => {
+      const hasCurrentInNewQueue = tracks.some(
+        (track) => track.id === state.currentTrack?.id
+      );
+      return {
+        tracks,
+        currentTrack: hasCurrentInNewQueue
+          ? state.currentTrack
+          : tracks[0] ?? null,
+      };
+    }),
+
   seekTo: (timeSeconds) => {
     const { audioElement, duration } = get();
     if (!audioElement) return;
@@ -147,12 +145,12 @@ export const useMusicStore = create<MusicStoreState>((set, get) => ({
   
   // Dummy logic for next/prev. Will be expanded if we have a real queue
   nextTrack: () => {
-    const { currentTrack } = get();
-    if (!currentTrack) return;
-    const currentIndex = mockTracks.findIndex(t => t.id === currentTrack.id);
-    const nextIndex = (currentIndex + 1) % mockTracks.length;
+    const { currentTrack, tracks } = get();
+    if (!currentTrack || tracks.length === 0) return;
+    const currentIndex = tracks.findIndex((t) => t.id === currentTrack.id);
+    const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % tracks.length : 0;
     set({
-      currentTrack: mockTracks[nextIndex],
+      currentTrack: tracks[nextIndex],
       isPlaying: true,
       progress: 0,
       currentTime: 0,
@@ -161,12 +159,15 @@ export const useMusicStore = create<MusicStoreState>((set, get) => ({
   },
   
   prevTrack: () => {
-    const { currentTrack } = get();
-    if (!currentTrack) return;
-    const currentIndex = mockTracks.findIndex(t => t.id === currentTrack.id);
-    const prevIndex = (currentIndex - 1 + mockTracks.length) % mockTracks.length;
+    const { currentTrack, tracks } = get();
+    if (!currentTrack || tracks.length === 0) return;
+    const currentIndex = tracks.findIndex((t) => t.id === currentTrack.id);
+    const prevIndex =
+      currentIndex >= 0
+        ? (currentIndex - 1 + tracks.length) % tracks.length
+        : 0;
     set({
-      currentTrack: mockTracks[prevIndex],
+      currentTrack: tracks[prevIndex],
       isPlaying: true,
       progress: 0,
       currentTime: 0,

@@ -84,18 +84,7 @@ Ao criar um novo componente, seguir este checklist:
 
 ### 4. Padrão para listas de músicas (tracks)
 
-- Todas as faixas devem seguir a interface `Track` definida em `useMusicStore`:
-  ```ts
-  export interface Track {
-    id: string;
-    title: string;
-    artist: string;
-    coverUrl: string;
-    audioUrl?: string;
-    youtubeUrl?: string;
-    duration?: string;
-  }
-  ```
+- Todas as faixas devem seguir a interface `Track` centralizada em `src/lib/tracks/types.ts`.
 
 - **Ao adicionar nova música**:
   - Usar um `id` em string incremental (`"4"`, `"5"`, ...).
@@ -119,4 +108,44 @@ Ao criar um novo componente, seguir este checklist:
   - **o que é o padrão**
   - **onde está implementado (componente/store)**
   - **como reutilizar em novos componentes**.
+
+### 7. Integração com Google Drive – Tracks & Photos
+
+- **Estrutura no Drive** (folder público configurado em `VITE_GOOGLE_DRIVE_ROOT_FOLDER_ID`):
+  - Pasta raiz (`Mashups` ou similar) → uma pasta por faixa, por exemplo `01_Desabafo_Sem_Freio`.
+  - Dentro de cada pasta de faixa existem **sempre** duas subpastas:
+    - `Photos/` → contém todas as fotos usadas na UI.
+    - `Track/` → contém o(s) arquivo(s) de áudio da faixa.
+
+- **Mapeamento para o domínio `Track`**:
+  - Implementação em `src/lib/tracks/drive-service.ts` (`getTracksFromDrive`).
+  - Para cada pasta de faixa:
+    - `Photos/`:
+      - Todas as imagens viram `Track.photos` (array de `{ url, alt }`).
+      - A **primeira imagem** é usada como `Track.coverUrl`.
+    - `Track/`:
+      - O primeiro arquivo de áudio vira `Track.audioUrl`, montado via `buildAudioUrl`.
+    - Demais campos:
+      - `id` e `title` usam o nome da pasta da faixa.
+      - `artist` padrão: `"Plurais"`.
+
+- **Provider de áudio (fácil trocar Drive → Spotify)**:
+  - Configuração em `src/lib/tracks/config.ts`:
+    - `AUDIO_PROVIDER`: `'drive' | 'spotify' | 'other'` (env `VITE_AUDIO_PROVIDER`).
+    - `buildDriveFileUrl(fileId)` monta a URL pública do arquivo no Drive.
+    - `buildAudioUrl({ provider, fileId, externalUrl })` resolve a URL de áudio a partir do provider.
+  - Hoje usamos:
+    - `audioProvider = 'drive'` com `fileId` do Google Drive.
+  - No futuro (ex.: Spotify):
+    - Basta mudar `AUDIO_PROVIDER` e passar `externalUrl`/`spotifyUrl` na criação da track, sem alterar os componentes.
+
+- **Consumo no front**:
+  - Hook `useTracks` em `src/lib/tracks/useTracks.ts` busca `Track[]` do Drive usando React Query (cache em memória).
+  - `PlaylistSection` usa `useTracks`:
+    - Se houver tracks do Drive, usa elas.
+    - Senão, faz fallback para `mockTracks` do `useMusicStore` (útil em desenvolvimento/offline).
+  - `TrackListCard`:
+    - Usa `track.coverUrl` para a capa.
+    - Passa `track.photos` para `AnimatedTestimonials` quando existir; caso contrário, usa a própria `coverUrl` como única imagem.
+
 
