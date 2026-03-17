@@ -6,13 +6,16 @@ export const DRIVE_ROOT_FOLDER_ID =
 export const AUDIO_PROVIDER: AudioProvider =
   (import.meta.env.VITE_AUDIO_PROVIDER as AudioProvider) || 'drive';
 
-const DRIVE_BASE_VIEW_URL = 'https://drive.google.com/uc';
+export const DRIVE_API_KEY =
+  import.meta.env.VITE_GOOGLE_DRIVE_API_KEY ?? '';
+
+const DRIVE_BASE_VIEW_URL = 'https://docs.google.com/uc';
 
 export function buildDriveFileUrl(fileId: string, opts?: { download?: boolean; thumbnail?: boolean }) {
   if (opts?.thumbnail) {
-    // Thumbnails são muito mais confiáveis para renderizar imagens do Drive no front-end
-    // sem cair em avisos de vírus ou redirecionamentos de download.
-    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1200`;
+    // LH3 é o servidor de imagens do Google que funciona muito melhor para renderizar diretamente no front-end
+    // sem redirecionamentos ou problemas de CORS/ORB.
+    return `https://lh3.googleusercontent.com/d/${fileId}=w1200`;
   }
   const exportType = opts?.download ? 'download' : 'view';
   return `${DRIVE_BASE_VIEW_URL}?export=${exportType}&id=${fileId}`;
@@ -25,13 +28,15 @@ export function buildAudioUrl(
 
   if (provider === 'drive') {
     if (!source.fileId) return undefined;
-    return buildDriveFileUrl(source.fileId, { download: false });
+    // Endpoint oficial da API do Google Drive para mídia (mais confiável para streaming)
+    // Usar alt=media com a chave de API evita muitos erros de 403 e redirecionamentos
+    return `https://www.googleapis.com/drive/v3/files/${source.fileId}?alt=media&key=${DRIVE_API_KEY}`;
   }
 
   if (provider === 'spotify') {
     return source.externalUrl;
   }
-
+  console.log(source, "sourcesourcesourcesource")
   return source.externalUrl ?? (source.fileId ? buildDriveFileUrl(source.fileId) : undefined);
 }
 

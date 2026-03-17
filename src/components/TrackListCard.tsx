@@ -101,7 +101,7 @@ export const TrackListCard = ({ track, index }: { track: Track; index: number })
         style={{ minHeight: '200px' }}
       >
         <div>
-          <h3 className="text-xl md:text-3xl font-display text-white mb-2 leading-tight">{(track.title.replaceAll("_", " "))}</h3>
+          <h3 className="text-xl md:text-3xl font-display text-white mb-2 leading-tight">{track.title}</h3>
           <p className="text-lg text-white/60 font-light">{track.artist}</p>
         </div>
 

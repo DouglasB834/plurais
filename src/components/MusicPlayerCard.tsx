@@ -1,4 +1,4 @@
-import { Play, Pause, SkipForward, SkipBack, Repeat, Shuffle } from 'lucide-react';
+import { Play, Pause, SkipForward, SkipBack, Repeat, Shuffle, ExternalLink } from 'lucide-react';
 import React, { useRef, useEffect } from 'react';
 
 import { useMusicStore } from '@/store/useMusicStore';
@@ -136,7 +136,7 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
         {...props}
       >
         {/* Elemento de áudio único que controla toda a reprodução */}
-        <audio ref={audioRef} className="hidden" />
+        <audio ref={audioRef} className="hidden" crossOrigin="anonymous" preload="auto" />
         {/* Decorative inner glow */}
         <div className="absolute top-0 right-0  bg-primary/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
         {/* Album Cover */}
@@ -153,9 +153,22 @@ export const MusicPlayerCard = React.forwardRef<HTMLDivElement, React.HTMLAttrib
         {/* Track Info */}
         <div className="flex flex-col items-center text-center px-2">
           <h3 className="text-lg font-light text-white/90 truncate w-full">{currentTrack.title}</h3>
-          <p className="text-xs text-white/70 truncate w-full font-light tracking-wide uppercase">
-            {currentTrack.artist}
-          </p>
+          <div className="flex flex-col items-center gap-1">
+            <p className="text-xs text-white/70 truncate w-full font-light tracking-wide uppercase">
+              {currentTrack.artist}
+            </p>
+            {currentTrack.externalUrl && (
+              <a 
+                href={currentTrack.externalUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-[10px] text-primary/60 hover:text-primary flex items-center gap-1 mt-1 transition-colors"
+              >
+                <ExternalLink size={10} />
+                Ouvir no Drive
+              </a>
+            )}
+          </div>
         </div>
 
         {/* Player Controls & Progress */}

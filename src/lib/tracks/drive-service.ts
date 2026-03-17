@@ -1,9 +1,7 @@
-import { DRIVE_ROOT_FOLDER_ID, buildDriveFileUrl, buildAudioUrl } from './config';
+import { DRIVE_ROOT_FOLDER_ID, buildDriveFileUrl, buildAudioUrl, DRIVE_API_KEY } from './config';
 import type { Track, TrackPhoto } from './types';
 
 const DRIVE_API_BASE = 'https://www.googleapis.com/drive/v3';
-
-const DRIVE_API_KEY = import.meta.env.VITE_GOOGLE_DRIVE_API_KEY ?? '';
 
 interface DriveFile {
   id: string;
@@ -97,13 +95,17 @@ export async function getTracksFromDrive(): Promise<Track[]> {
     }
 
     let audioUrl: string | undefined;
+    let externalUrl: string | undefined;
     if (trackFolder) {
       const audioFiles = (await listChildren(trackFolder.id)).filter(isAudio);
       if (audioFiles[0]) {
+        const fileId = audioFiles[0].id;
         audioUrl = buildAudioUrl({
           provider: 'drive',
-          fileId: audioFiles[0].id,
+          fileId,
         });
+        // Link de fallback para abrir no Google Drive se o player falhar
+        externalUrl = `https://drive.google.com/file/d/${fileId}/view`;
       }
     }
 
@@ -111,16 +113,19 @@ export async function getTracksFromDrive(): Promise<Track[]> {
       continue;
     }
 
-    const baseId = folder.name;
+    const folderName = folder.name;
+    // Limpa o título: remove números iniciais (ex: "01_") e troca "_" por espaço
+    const cleanTitle = folderName.replace(/^\d+[\s_-]*/, '').replace(/_/g, ' ');
 
     const track: Track = {
-      id: baseId,
-      title: baseId,
+      id: folderName,
+      title: cleanTitle,
       artist: 'Plurais',
       coverUrl: photos[0]?.url ?? '',
       audioUrl,
       photos,
       audioProvider: 'drive',
+      externalUrl,
     };
 
     tracks.push(track);
